@@ -1,0 +1,25 @@
+# CIPHERX AI + PAGER-X v0.7.0 - local cloud stack
+# Copy backend/.env.example to backend/.env and fill in real secrets first.
+services:
+  backend:
+    build: ./backend
+    container_name: cipherx-backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./backend/.env
+    environment:
+      - PORT=8080
+      - DATA_DIR=/app/data
+    volumes:
+      - cipherx-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  cipherx-data:

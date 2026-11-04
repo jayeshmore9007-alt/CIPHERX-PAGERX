@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "CIPHERX AI",
+    "slug": "cipherx-ai",
+    "version": "0.7.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#000000",
+    "android": {
+      "package": "com.jayeshmore.cipherxai",
+      "versionCode": 7,
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.ACCESS_WIFI_STATE"
+      ],
+      "allowBackup": false
+    },
+    "assetBundlePatterns": ["assets/*"],
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSLocalNetworkUsageDescription": "CIPHERX AI connects to your own backend server on the local network."
+      }
+    },
+    "plugins": [],
+    "extra": {
+      "eas": {
+        "projectId": ""
+      }
+    }
+  }
+}
