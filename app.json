@@ -1,4 +1,8 @@
-version": "0.7.0",
+{
+  "expo": {
+    "name": "CIPHERX AI",
+    "slug": "cipherx-ai",
+    "version": "0.7.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#000000",
@@ -22,7 +26,7 @@ version": "0.7.0",
     "plugins": [],
     "extra": {
       "eas": {
-        "projectId": ""
+        "projectId": "YOUR_REAL_EAS_PROJECT_ID"
       }
     }
   }
