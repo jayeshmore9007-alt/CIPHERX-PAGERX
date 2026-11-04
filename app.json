@@ -1,8 +1,4 @@
-{
-  "expo": {
-    "name": "CIPHERX AI",
-    "slug": "cipherx-ai",
-    "version": "0.7.0",
+version": "0.7.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#000000",
