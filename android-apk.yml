@@ -1,0 +1,29 @@
+
+name: CIPHERX AI - Android APK Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build CIPHERX Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        working-directory: app
+        run: npm install
+
+      - name: Build Android APK
+        working-directory: app
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli@latest build --platform android --profile preview --non-interactive
