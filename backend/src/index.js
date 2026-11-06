@@ -16,6 +16,7 @@ const orchestrator = require('./services/agentOrchestrator');
 const registry = require('./services/agentRegistry');
 const deviceManager = require('./services/deviceManager');
 const pagerxCommander = require('./services/pagerxCommander');
+const santokiCommander = require('./services/santokiCommander');
 const networkDiag = require('./services/networkDiag');
 const reportService = require('./services/reportService');
 
@@ -300,6 +301,24 @@ app.post('/api/pagerx/commander/message', requireAuth, async (req, res) => {
 });
 app.get('/api/devices/:id/tasks', requireAuth, (req, res) => {
   res.json({ tasks: deviceManager.taskHistory(req.params.id) });
+});
+
+// SANTOKI AI COMMANDER - Marathi-first central planning brain (plan-only).
+app.get('/api/santoki/capabilities', requireAuth, (req, res) => {
+  res.json(santokiCommander.capabilities());
+});
+app.post('/api/santoki/message', requireAuth, async (req, res) => {
+  const { message } = req.body || {};
+  if (typeof message !== 'string' || !message.trim()) return res.status(400).json({ error: 'message is required.' });
+  if (message.length > 2000) return res.status(413).json({ error: 'Message too long (max 2000 characters).' });
+  try {
+    const result = await santokiCommander.planMessage(message);
+    store.audit('santoki.plan', result.status, 'SANTOKI created a plan-only response; no device or computer action was executed.');
+    res.json(result);
+  } catch (error) {
+    store.audit('santoki.plan', 'FAILED', 'SANTOKI planning request failed.');
+    res.status(error.statusCode || 500).json({ error: error.statusCode ? error.message : 'SANTOKI planning failed.' });
+  }
 });
 
 // --- server + websocket ---
