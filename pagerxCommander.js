@@ -1,5 +1,5 @@
-// PAGER-X Commander AI: deterministic intent routing over the existing hard allowlist.
-// User text is never executed as shell. Only fixed operations in deviceManager are called.
+// PAGER-X Commander AI: optional LLM intent classification over a fixed read-only allowlist.
+// User text and model output are never executed as shell commands.
 const deviceManager = require('./deviceManager');
 const gateway = require('./modelGateway');
 
@@ -64,7 +64,6 @@ async function handleMessage({ deviceId, message }) {
   };
 }
 
-module.exports = { classify, classifyWithAI, capabilities, handleMessage };
 const BLOCKED_INTENT = /deauth|de-auth|rogue ap|evil twin|handshake capture|credential|password capture|intercept|man.in.the.middle|exfiltrat|steal|attack/i;
 
 async function classifyWithAI(message) {
@@ -92,3 +91,6 @@ async function classifyWithAI(message) {
   return classify(text);
 }
 
+
+
+module.exports = { classify, classifyWithAI, capabilities, handleMessage };
