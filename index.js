@@ -8,16 +8,16 @@ const path = require('path');
 const fs = require('fs');
 const WebSocket = require('ws');
 
-const store = require('./services/persistence');
-const sandbox = require('./services/sandbox');
-const intake = require('./services/fileIntake');
-const gateway = require('./services/modelGateway');
-const orchestrator = require('./services/agentOrchestrator');
-const registry = require('./services/agentRegistry');
-const deviceManager = require('./services/deviceManager');
-const pagerxCommander = require('./services/pagerxCommander');
-const networkDiag = require('./services/networkDiag');
-const reportService = require('./services/reportService');
+const store = require('./persistence');
+const sandbox = require('./sandbox');
+const intake = require('./fileIntake');
+const gateway = require('./modelGateway');
+const orchestrator = require('./agentOrchestrator');
+const registry = require('./agentRegistry');
+const deviceManager = require('./deviceManager');
+const pagerxCommander = require('./pagerxCommander');
+const networkDiag = require('./networkDiag');
+const reportService = require('./reportService');
 
 const PORT = Number(process.env.PORT || 8080);
 const OPERATOR_USER = process.env.OPERATOR_USER || 'operator';
