@@ -52,7 +52,7 @@ export const PagerXScreen: React.FC = () => {
     setCommanderReply('');
     try {
       const r = await pagerxCommanderMessage(commanderDevice, commanderInput.trim());
-      setCommanderReply(r.reply || JSON.stringify(r.result || r));
+      setCommanderReply([r.reply, r.result?.output, r.result?.detail].filter(Boolean).join('\n\n') || JSON.stringify(r));
       setCommanderInput('');
     } catch (e: any) {
       setCommanderReply(e.message || 'Commander request failed.');
