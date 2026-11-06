@@ -112,6 +112,10 @@ export const deviceHealth = (id: string) => call<{ healthy: boolean; detail: str
 export const deviceTasks = (id: string) => call<{ tasks: any[] }>('GET', `/api/devices/${id}/tasks`);
 export const pagerxCommand = (deviceId: string, command: string) =>
   call<any>('POST', '/api/pagerx/command', { deviceId, command });
+export const pagerxCommanderCapabilities = () =>
+  call<any>('GET', '/api/pagerx/commander/capabilities');
+export const pagerxCommanderMessage = (deviceId: string, message: string) =>
+  call<any>('POST', '/api/pagerx/commander/message', { deviceId, message });
 
 // WebSocket
 export function openSocket(onEvent: (evt: any) => void): WebSocket {
