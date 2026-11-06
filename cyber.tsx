@@ -35,9 +35,9 @@ export const StatusDot: React.FC<{ state?: string }> = ({ state }) => (
 );
 
 export const Chip: React.FC<{
-  label: string; state?: string; onPress?: () => void; style?: StyleProp<ViewStyle>;
-}> = ({ label, state, onPress, style }) => {
-  const color = state ? statusColor(state) : COLORS.textDim;
+  label: string; state?: string; active?: boolean; onPress?: () => void; style?: StyleProp<ViewStyle>;
+}> = ({ label, state, active, onPress, style }) => {
+  const color = state ? statusColor(state) : active ? COLORS.primary : COLORS.textDim;
   const body = (
     <View style={[styles.chip, { borderColor: color }, style]}>
       <Text style={[styles.chipText, { color }]}>{label}</Text>
