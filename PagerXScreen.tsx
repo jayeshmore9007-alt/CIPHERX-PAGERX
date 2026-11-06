@@ -1,7 +1,8 @@
 // PagerXScreen.tsx - PAGER-X authorized device management: enrollment,
 // approval, hard allowlisted diagnostics, health checks and task history.
 import React, { useEffect, useState } from 'react';
-import { TextInput, StyleSheet, Alert, View, Linking } from 'react-native';
+import { TextInput, StyleSheet, Alert, View, Modal } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { Panel, GlowButton, Mono, ScreenWrap, SectionHeader, StatusDot } from '../components/cyber';
 import { COLORS } from '../theme';
 import { devices, enrollDevice, approveDevice, revokeDevice, deviceHealth, deviceTasks, pagerxCommand, pagerxCommanderMessage } from '../api/client';
@@ -16,6 +17,8 @@ export const PagerXScreen: React.FC = () => {
   const [commanderInput, setCommanderInput] = useState('');
   const [commanderReply, setCommanderReply] = useState('');
   const [commanderBusy, setCommanderBusy] = useState(false);
+  const [virtualPagerVisible, setVirtualPagerVisible] = useState(false);
+  const [virtualPagerUrl, setVirtualPagerUrl] = useState('');
 
   const load = async () => { try { setList((await devices()).devices || []); } catch {} };
   useEffect(() => { load(); }, []);
@@ -50,12 +53,8 @@ export const PagerXScreen: React.FC = () => {
     const selected = list.find((d: any) => d.id === commanderDevice);
     const host = selected?.host;
     if (!host) return Alert.alert('Select a Pager', 'Enroll and select your Pager first.');
-    const url = `http://${host}`;
-    try {
-      await Linking.openURL(url);
-    } catch {
-      Alert.alert('Cannot open Pager', 'Connect this phone to the Pager management network (or supported USB-C Ethernet) and try again.');
-    }
+    setVirtualPagerUrl(`http://${host}`);
+    setVirtualPagerVisible(true);
   };
 
   const sendCommanderMessage = async () => {
@@ -136,6 +135,31 @@ export const PagerXScreen: React.FC = () => {
             ))}
         </Panel>
       ) : null}
+      <Modal visible={virtualPagerVisible} animationType="slide" onRequestClose={() => setVirtualPagerVisible(false)}>
+        <View style={{ flex: 1, backgroundColor: COLORS.black }}>
+          <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: COLORS.border }}>
+            <GlowButton label="CLOSE VIRTUAL PAGER" variant="ghost" onPress={() => setVirtualPagerVisible(false)} />
+            <Mono>Connected page: {virtualPagerUrl}</Mono>
+          </View>
+          {virtualPagerUrl ? (
+            <WebView
+              source={{ uri: virtualPagerUrl }}
+              javaScriptEnabled
+              domStorageEnabled
+              mixedContentMode="compatibility"
+              originWhitelist={['http://*', 'https://*']}
+              onShouldStartLoadWithRequest={(request) => {
+                const host = virtualPagerUrl.replace(/^https?:\\/\\//, '').split('/')[0];
+                return request.url.startsWith(`http://${host}`) ||
+                  request.url.startsWith(`https://${host}`) ||
+                  request.url === 'about:blank';
+              }}
+              onError={() => Alert.alert('Pager page unavailable', 'Confirm the phone is connected to the Pager management network and the device address is correct.')}
+              style={{ flex: 1, backgroundColor: COLORS.black }}
+            />
+          ) : null}
+        </View>
+      </Modal>
     </ScreenWrap>
   );
 };
