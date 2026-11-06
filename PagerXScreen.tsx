@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { TextInput, StyleSheet, Alert, View } from 'react-native';
 import { Panel, GlowButton, Mono, ScreenWrap, SectionHeader, StatusDot } from '../components/cyber';
 import { COLORS } from '../theme';
-import { devices, enrollDevice, approveDevice, revokeDevice, deviceHealth, deviceTasks, pagerxCommand } from '../api/client';
+import { devices, enrollDevice, approveDevice, revokeDevice, deviceHealth, deviceTasks, pagerxCommand, pagerxCommanderMessage } from '../api/client';
 import { DEVICE_ALLOWLIST } from '../agents/registry';
 
 export const PagerXScreen: React.FC = () => {
@@ -12,6 +12,10 @@ export const PagerXScreen: React.FC = () => {
   const [form, setForm] = useState({ name: '', host: '', user: '', port: '22' });
   const [tasksFor, setTasksFor] = useState<string | null>(null);
   const [tasks, setTasks] = useState<any[]>([]);
+  const [commanderDevice, setCommanderDevice] = useState<string | null>(null);
+  const [commanderInput, setCommanderInput] = useState('');
+  const [commanderReply, setCommanderReply] = useState('');
+  const [commanderBusy, setCommanderBusy] = useState(false);
 
   const load = async () => { try { setList((await devices()).devices || []); } catch {} };
   useEffect(() => { load(); }, []);
@@ -42,6 +46,21 @@ export const PagerXScreen: React.FC = () => {
     ]);
   };
 
+  const sendCommanderMessage = async () => {
+    if (!commanderDevice || !commanderInput.trim() || commanderBusy) return;
+    setCommanderBusy(true);
+    setCommanderReply('');
+    try {
+      const r = await pagerxCommanderMessage(commanderDevice, commanderInput.trim());
+      setCommanderReply(r.reply || JSON.stringify(r.result || r));
+      setCommanderInput('');
+    } catch (e: any) {
+      setCommanderReply(e.message || 'Commander request failed.');
+    } finally {
+      setCommanderBusy(false);
+    }
+  };
+
   const openTasks = async (id: string) => {
     try { const r = await deviceTasks(id); setTasks(r.tasks || []); setTasksFor(id); }
     catch (e: any) { Alert.alert('Failed', e.message); }
@@ -50,6 +69,17 @@ export const PagerXScreen: React.FC = () => {
   return (
     <ScreenWrap>
       <SectionHeader title="PAGER-X" subtitle="Authorized device diagnostics with a hard command allowlist" />
+      <Panel title="PAGERX MASTER AI · COMMANDER">
+        <Mono>Choose an APPROVED Pager, then ask for connection health, status, uptime, network interfaces, storage or recent logs.</Mono>
+        <View style={styles.row}>
+          {list.filter((d: any) => d.status === 'APPROVED').map((d: any) => (
+            <GlowButton key={d.id} label={commanderDevice === d.id ? `Selected: ${d.name}` : d.name} variant={commanderDevice === d.id ? 'primary' : 'ghost'} onPress={() => setCommanderDevice(d.id)} />
+          ))}
+        </View>
+        <TextInput style={styles.input} placeholder="Ask PAGER-X AI (e.g. check device status)" placeholderTextColor={COLORS.textDim} value={commanderInput} onChangeText={setCommanderInput} multiline />
+        <GlowButton label={commanderBusy ? "Working..." : "Ask Commander AI"} onPress={sendCommanderMessage} />
+        {commanderReply ? <Mono>{commanderReply}</Mono> : null}
+      </Panel>
       <Panel title="Enroll device (requires explicit approval)">
         <TextInput style={styles.input} placeholder="Device name" placeholderTextColor={COLORS.textDim} value={form.name} onChangeText={(t) => setForm({ ...form, name: t })} />
         <TextInput style={styles.input} placeholder="Host / IP" placeholderTextColor={COLORS.textDim} autoCapitalize="none" value={form.host} onChangeText={(t) => setForm({ ...form, host: t })} />
