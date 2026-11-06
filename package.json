@@ -8,7 +8,8 @@
     "build:android:dev": "eas build --platform android --profile development",
     "build:android:preview": "eas build --platform android --profile preview",
     "build:android:production": "eas build --platform android --profile production",
-    "build:android:local": "eas build --platform android --profile production --local"
+    "build:android:local": "eas build --platform android --profile production --local",
+    "test": "node --test"
   },
   "dependencies": {
     "@react-native-community/netinfo": "^11.3.1",
