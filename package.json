@@ -9,7 +9,7 @@
     "build:android:preview": "eas build --platform android --profile preview",
     "build:android:production": "eas build --platform android --profile production",
     "build:android:local": "eas build --platform android --profile production --local",
-    "test": "node --test"
+    "test": "node --test deviceManager.test.js pagerxCommander.test.js"
   },
   "dependencies": {
     "@react-native-community/netinfo": "^11.3.1",
