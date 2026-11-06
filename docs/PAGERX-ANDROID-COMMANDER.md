@@ -21,7 +21,7 @@ Sources:
 
 Android app -> authenticated CIPHERX backend -> enrolled Pager over SSH.
 
-For visual control, the Android app can open the Pager's own Virtual Pager page in the phone browser. The phone must be connected to the Pager's management network or a supported USB-C Ethernet path. The app uses the enrolled private IPv4 address as the browser destination; verify the actual address on the device/network. The documented `172.16.52.1` is the initial USB setup address, not a guarantee that every management configuration uses the same address or route.
+For visual control, the Android PAGER-X screen embeds the Pager's own Virtual Pager page in a native WebView. The phone must be connected to the Pager's management network or a supported USB-C Ethernet path. The app uses the enrolled private IPv4 address as the WebView destination and restricts page navigation to that enrolled host; verify the actual address on the device/network. The documented `172.16.52.1` is the initial USB setup address, not a guarantee that every management configuration uses the same address or route.
 
 For SSH diagnostics, the CIPHERX backend must be running on a machine that can route to the Pager's private address. A cloud-hosted backend normally cannot reach a Pager on the phone's local USB/Wi-Fi network unless a deliberately configured private VPN/tunnel connects them. Do not expose the Pager's SSH service to the public internet.
 
