@@ -87,7 +87,7 @@ export const PagerXScreen: React.FC = () => {
             <GlowButton key={d.id} label={commanderDevice === d.id ? `Selected: ${d.name}` : d.name} variant={commanderDevice === d.id ? 'primary' : 'ghost'} onPress={() => setCommanderDevice(d.id)} />
           ))}
         </View>
-        <GlowButton label="Open Virtual Pager in Browser" variant="ghost" onPress={openVirtualPager} />
+        <GlowButton label="OPEN VIRTUAL PAGER · IN APP" variant="ghost" onPress={openVirtualPager} />
         <TextInput style={styles.input} placeholder="Ask PAGER-X AI (e.g. check device status)" placeholderTextColor={COLORS.textDim} value={commanderInput} onChangeText={setCommanderInput} multiline />
         <GlowButton label={commanderBusy ? "Working..." : "Ask Commander AI"} onPress={sendCommanderMessage} />
         {commanderReply ? <Mono>{commanderReply}</Mono> : null}
@@ -150,8 +150,10 @@ export const PagerXScreen: React.FC = () => {
               originWhitelist={['http://*', 'https://*']}
               onShouldStartLoadWithRequest={(request) => {
                 const host = virtualPagerUrl.replace('http://', '').replace('https://', '').split('/')[0];
-                return request.url.startsWith(`http://${host}`) ||
-                  request.url.startsWith(`https://${host}`) ||
+                const httpOrigin = `http://${host}`;
+                const httpsOrigin = `https://${host}`;
+                return request.url === httpOrigin || request.url.startsWith(httpOrigin + '/') || request.url.startsWith(httpOrigin + '?') ||
+                  request.url === httpsOrigin || request.url.startsWith(httpsOrigin + '/') || request.url.startsWith(httpsOrigin + '?') ||
                   request.url === 'about:blank';
               }}
               onError={() => Alert.alert('Pager page unavailable', 'Confirm the phone is connected to the Pager management network and the device address is correct.')}
