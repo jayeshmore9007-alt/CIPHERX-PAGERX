@@ -38,13 +38,15 @@ test('toHtml refuses DONE_WITH_ERRORS? No - it is accepted', () => {
   assert.ok(html.includes('DONE_WITH_ERRORS'));
 });
 
-test('streamPdf writes a real PDF header', () => {
-  const target = path.join(os.tmpdir(), `rep-${Date.now()}.pdf`);
+test('streamPdf writes a real PDF header', async () => {
+  const target = path.join(os.tmpdir(), `rep-${Date.now()}-${Math.random().toString(16).slice(2)}.pdf`);
   const ws = fs.createWriteStream(target);
-  const ok = reportService.streamPdf(doneJob, ws);
-  assert.strictEqual(ok, true);
-  ws.end();
-  // header check after flush
+  const finished = new Promise((resolve, reject) => {
+    ws.once('finish', resolve);
+    ws.once('error', reject);
+  });
+  assert.strictEqual(reportService.streamPdf(doneJob, ws), true);
+  await finished;
   const buf = fs.readFileSync(target);
   assert.strictEqual(buf.slice(0, 4).toString(), '%PDF');
   fs.unlinkSync(target);
