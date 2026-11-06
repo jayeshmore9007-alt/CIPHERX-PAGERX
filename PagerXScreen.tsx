@@ -149,7 +149,7 @@ export const PagerXScreen: React.FC = () => {
               mixedContentMode="compatibility"
               originWhitelist={['http://*', 'https://*']}
               onShouldStartLoadWithRequest={(request) => {
-                const host = virtualPagerUrl.replace(/^https?:\\/\\//, '').split('/')[0];
+                const host = virtualPagerUrl.replace('http://', '').replace('https://', '').split('/')[0];
                 return request.url.startsWith(`http://${host}`) ||
                   request.url.startsWith(`https://${host}`) ||
                   request.url === 'about:blank';
