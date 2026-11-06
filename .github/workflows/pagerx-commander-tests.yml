@@ -16,7 +16,5 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install backend dependencies
-        run: npm install --ignore-scripts
       - name: Run Commander boundary tests
-        run: npm test
+        run: node --test deviceManager.test.js pagerxCommander.test.js
