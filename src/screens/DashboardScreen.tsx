@@ -1,12 +1,14 @@
 // DashboardScreen.tsx - live system overview: health, tools, jobs, WS activity.
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Panel, SectionHeader, Chip, StatusDot, Mono, ScreenWrap } from '../components/cyber';
+import { useNavigation } from '@react-navigation/native';
+import { Panel, SectionHeader, Chip, StatusDot, Mono, ScreenWrap, GlowButton } from '../components/cyber';
 import { HoloCore } from '../components/HoloCore';
 import { COLORS } from '../theme';
 import { health, getTools, jobs, aiProviders, openSocket } from '../api/client';
 
 export const DashboardScreen: React.FC = () => {
+  const navigation = useNavigation<any>();
   const [status, setStatus] = useState<any>(null);
   const [tools, setTools] = useState<Record<string, string>>({});
   const [jobStats, setJobStats] = useState<any>({});
@@ -41,6 +43,10 @@ export const DashboardScreen: React.FC = () => {
     <ScreenWrap>
       <SectionHeader title="CIPHERX CORE" subtitle="Real backend state - no simulated data" />
       <HoloCore size={110} />
+      <Panel title="SANTOKI AI COMMANDER">
+        <Mono>मराठीत सांगा. SANTOKI तुमची विनंती समजून योग्य एजंट आणि सुरक्षित कृती योजना तयार करेल.</Mono>
+        <GlowButton label="OPEN SANTOKI AI COMMANDER" onPress={() => navigation.navigate('Santoki')} />
+      </Panel>
       <Panel title="System status">
         <StatusDot state={status?.status || 'DISCONNECTED'} />
         {status?.version ? <Mono>Backend v{status.version}</Mono> : null}
