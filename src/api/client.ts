@@ -138,3 +138,8 @@ export function openSocket(onEvent: (evt: any) => void): WebSocket {
     close: () => { try { ws.close(); } catch { /* ignore */ } },
   } as unknown as WebSocket;
 }
+
+ // SANTOKI AI Commander
+export const santokiMessage = (message: string) =>
+  call<{ status: string; domain?: string; summary_mr: string; steps_mr: string[]; needs_approval: boolean; execution: string }>('POST', '/api/santoki/message', { message });
+export const santokiCapabilities = () => call<any>('GET', '/api/santoki/capabilities');
