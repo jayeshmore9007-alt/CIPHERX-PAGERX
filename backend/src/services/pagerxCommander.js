@@ -1,6 +1,7 @@
-// PAGER-X Commander AI: deterministic intent routing over the existing hard allowlist.
-// User text is never executed as shell. Only fixed operations in deviceManager are called.
+// PAGER-X Commander AI: optional LLM intent classification over a fixed read-only allowlist.
+// User text and model output are never executed as shell commands.
 const deviceManager = require('./deviceManager');
+const gateway = require('./modelGateway');
 
 const INTENTS = [
   { id: 'device_health', patterns: [/\b(health|reachable|connection|connectivity)\b/i, /कनेक्शन|जोडले|जोडणी|ऑनलाइन आहे का/i], action: 'health' },
@@ -20,7 +21,8 @@ function classify(message) {
 function capabilities() {
   return {
     agent: 'PAGERX COMMANDER AI',
-    mode: 'deterministic-safe-command-router',
+    mode: 'llm-assisted-intent-router-with-deterministic-fallback',
+    intelligence: 'Optional configured CIPHERX model provider; only validated intent IDs can be selected.',
     available: [
       { id: 'device_health', description: 'Check whether the enrolled Pager SSH endpoint is reachable.' },
       { id: 'system_status', description: 'Read basic device/system identity.' },
@@ -41,7 +43,7 @@ function capabilities() {
 
 async function handleMessage({ deviceId, message }) {
   if (!deviceId) return { status: 'NEEDS_DEVICE', reply: 'आधी enrolled Pager device निवड.' };
-  const intent = classify(message);
+  const intent = await classifyWithAI(message);
   if (!intent) {
     return {
       status: 'UNSUPPORTED_INTENT',
@@ -62,4 +64,33 @@ async function handleMessage({ deviceId, message }) {
   };
 }
 
-module.exports = { classify, capabilities, handleMessage };
+const BLOCKED_INTENT = /deauth|de-auth|rogue ap|evil twin|handshake capture|credential|password capture|intercept|man.in.the.middle|exfiltrat|steal|attack/i;
+
+async function classifyWithAI(message) {
+  const text = String(message || '').trim();
+  if (!text || text.length > 500 || BLOCKED_INTENT.test(text)) return null;
+
+  // The model may choose an intent ID only. It never supplies a command,
+  // shell fragment, URL, target, or payload. Unknown IDs fail closed.
+  try {
+    const response = await gateway.runWithFallback({
+      system: 'You are a strict intent classifier for a device-management assistant. Return exactly one JSON object: {"intent":"device_health|system_status|uptime|network_interfaces|storage|recent_logs|unsupported"}. Choose only a listed read-only diagnostic intent. If the user asks for anything else, return unsupported. Never output commands or extra text.',
+      user: text,
+      preferredProvider: null,
+      preferredModel: null,
+    });
+    const raw = String(response.text || '').trim().replace(/^\x60{3}(?:json)?\s*/i, '').replace(/\s*\x60{3}$/i, '');
+    const parsed = JSON.parse(raw);
+    const intent = INTENTS.find((item) => item.id === parsed.intent);
+    if (intent) return intent;
+    if (parsed.intent === 'unsupported') return null;
+  } catch {
+    // No configured provider, malformed model output, or provider failure:
+    // continue with deterministic local intent matching.
+  }
+  return classify(text);
+}
+
+
+
+module.exports = { classify, classifyWithAI, capabilities, handleMessage };
