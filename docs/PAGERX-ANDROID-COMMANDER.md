@@ -68,3 +68,30 @@ Future state-changing operations must be implemented only against documented Pag
 ## Tests
 
 Run `npm test` from the backend repository root. The tests cover intent routing boundaries and private-address validation. Hardware connectivity still requires an actual Pager and a backend host on the same reachable private network.
+
+
+## Recommended Android-only deployment (Termux)
+
+For a phone-first setup, run the CIPHERX backend locally in Termux on the same Android phone that runs the APK. This keeps the Pager SSH connection on the phone's private network and avoids a cloud server trying to reach a private USB/Wi-Fi address.
+
+1. Clone this repository into Termux (or use the existing local checkout).
+2. From the repository root, run:
+   `bash scripts/setup-termux-backend.sh`
+3. Save the generated `operator` password printed once by the script.
+4. Connect the phone to the Pager's management Wi-Fi, or connect the supported USB-C Ethernet path. Verify the Pager's actual private IP.
+5. Add the Pager's verified SSH host key to the dedicated file shown in `backend/.env`. Use `ssh-keyscan` to collect the key, then verify the fingerprint over a trusted local channel before accepting it. The backend uses strict host-key checking and refuses an unknown/changed key.
+6. Add the generated public key printed by the setup script to the Pager's `/root/.ssh/authorized_keys` using the Pager's trusted local Virtual Pager terminal or an authenticated initial SSH session. Do not copy the private key.
+7. Enroll the Pager in the app (default USB host is `172.16.52.1`, SSH user `root`), approve it, and run a read-only diagnostic.
+8. Start the backend from the repository root with `bash scripts/start-termux-backend.sh`. Keep Termux running while using the Android app.
+
+The Android app's default backend gateway is `http://127.0.0.1:8080`, which points to the Termux backend on the same phone. Android cleartext traffic is enabled for this local HTTP development path. Use HTTPS for any backend reachable over an external network; do not expose port 8080 or Pager SSH to the public internet.
+
+## EAS build setup
+
+The repository is configured to build an APK from the repository root. Before the first non-interactive GitHub Actions EAS build, link this Expo project once from the repository root using `npx eas-cli@latest init`, then commit the real `extra.eas.projectId` that Expo writes to `app.json`. Add the Expo access token as the GitHub Actions secret named `EXPO_TOKEN`. Never put the token in source files or chat.
+
+The workflow `.github/workflows/android-apk.yml` runs backend tests, then builds the Android production APK. The pull-request workflow also runs backend tests and the Expo TypeScript check.
+
+## Scope boundary
+
+This companion is designed for your own Pager and authorized lab networks. The AI may interpret requests, but every executable action must map to a reviewed fixed operation. Read-only diagnostics are the current SSH automation scope. Payload installation/execution, wireless state changes, capture, interception, credential collection, deauthentication, rogue access-point automation, and exfiltration are not exposed by this app.
