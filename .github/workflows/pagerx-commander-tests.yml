@@ -24,3 +24,7 @@ jobs:
       - name: Run backend test suite
         working-directory: backend
         run: npm test
+      - name: Install Expo app dependencies
+        run: npm install
+      - name: Type-check Android app
+        run: npx tsc --noEmit
