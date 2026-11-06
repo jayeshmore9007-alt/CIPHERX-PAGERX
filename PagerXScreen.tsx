@@ -9,7 +9,7 @@ import { DEVICE_ALLOWLIST } from '../agents/registry';
 
 export const PagerXScreen: React.FC = () => {
   const [list, setList] = useState<any[]>([]);
-  const [form, setForm] = useState({ name: '', host: '', user: '', port: '22' });
+  const [form, setForm] = useState({ name: 'WiFi Pineapple Pager', host: '172.16.52.1', user: 'root', port: '22' });
   const [tasksFor, setTasksFor] = useState<string | null>(null);
   const [tasks, setTasks] = useState<any[]>([]);
   const [commanderDevice, setCommanderDevice] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export const PagerXScreen: React.FC = () => {
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'I authorize', onPress: async () => {
-          try { await enrollDevice({ name, host, user, port: Number(port) || 22 }); setForm({ name: '', host: '', user: '', port: '22' }); load(); }
+          try { await enrollDevice({ name, host, user, port: Number(port) || 22 }); setForm({ name: 'WiFi Pineapple Pager', host: '172.16.52.1', user: 'root', port: '22' }); load(); }
           catch (e: any) { Alert.alert('Enrollment failed', e.message); }
         } }
       ]);
@@ -95,7 +95,7 @@ export const PagerXScreen: React.FC = () => {
       </Panel>
       <Panel title="Enroll device (requires explicit approval)">
         <TextInput style={styles.input} placeholder="Device name" placeholderTextColor={COLORS.textDim} value={form.name} onChangeText={(t) => setForm({ ...form, name: t })} />
-        <TextInput style={styles.input} placeholder="Host / IP" placeholderTextColor={COLORS.textDim} autoCapitalize="none" value={form.host} onChangeText={(t) => setForm({ ...form, host: t })} />
+        <TextInput style={styles.input} placeholder="Host / IP (default USB address 172.16.52.1)" placeholderTextColor={COLORS.textDim} autoCapitalize="none" value={form.host} onChangeText={(t) => setForm({ ...form, host: t })} />
         <TextInput style={styles.input} placeholder="SSH user" placeholderTextColor={COLORS.textDim} autoCapitalize="none" value={form.user} onChangeText={(t) => setForm({ ...form, user: t })} />
         <TextInput style={styles.input} placeholder="SSH port (22)" placeholderTextColor={COLORS.textDim} keyboardType="numeric" value={form.port} onChangeText={(t) => setForm({ ...form, port: t })} />
         <GlowButton label="Enroll device" onPress={doEnroll} />
