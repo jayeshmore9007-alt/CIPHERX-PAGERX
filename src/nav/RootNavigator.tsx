@@ -14,6 +14,7 @@ import { MonitorScreen } from '../screens/MonitorScreen';
 import { SecurityScreen } from '../screens/SecurityScreen';
 import { AutomationScreen } from '../screens/AutomationStudio';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import { SantokiScreen } from '../screens/SantokiScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +39,7 @@ export const RootNavigator: React.FC = () => (
         contentStyle: { backgroundColor: COLORS.black },
       }}>
       <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'CIPHERX CORE' }} />
+      <Stack.Screen name="Santoki" component={SantokiScreen} options={{ title: 'SANTOKI AI COMMANDER' }} />
       <Stack.Screen name="Agents" component={AgentsScreen} options={{ title: 'AI AGENTS' }} />
       <Stack.Screen name="Projects" component={ProjectsScreen} options={{ title: 'PROJECTS' }} />
       <Stack.Screen name="Relab" component={RelabScreen} options={{ title: 'RE LAB' }} />
