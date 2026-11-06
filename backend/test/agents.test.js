@@ -10,7 +10,7 @@ const registry = require('../src/services/agentRegistry');
 
 test('catalog contains all 14 real agents', () => {
   const ids = orchestrator.CATALOG.map((a) => a.id).sort();
-  assert.deepStrictEqual(ids, ['apk', 'apimapper', 'behavior', 'code', 'dependency', 'dex', 'logic', 'manifest', 'native', 'network', 'report', 'resource', 'security', 'ui']);
+  assert.deepStrictEqual(ids, ['apimapper', 'apk', 'behavior', 'code', 'dependency', 'dex', 'logic', 'manifest', 'native', 'network', 'report', 'resource', 'security', 'ui']);
   for (const a of orchestrator.CATALOG) {
     assert.ok(a.name && a.description && a.systemPrompt, `agent ${a.id} incomplete`);
   }
