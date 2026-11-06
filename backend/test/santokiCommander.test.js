@@ -40,5 +40,5 @@ test('SANTOKI plans disclose executor state and require approval', async () => {
 test('SANTOKI capabilities disclose executor limitations', () => {
   const info = capabilities();
   assert.equal(info.current_mode, 'PLAN_AND_ROUTE');
-  assert.equal(info.agent_map.authorized_computer_agent.executor, 'NOT_CONNECTED');
+  assert.equal(info.agent_map.computer.executor, 'NOT_CONNECTED');
 });
