@@ -15,6 +15,7 @@ const gateway = require('./services/modelGateway');
 const orchestrator = require('./services/agentOrchestrator');
 const registry = require('./services/agentRegistry');
 const deviceManager = require('./services/deviceManager');
+const pagerxCommander = require('./services/pagerxCommander');
 const networkDiag = require('./services/networkDiag');
 const reportService = require('./services/reportService');
 
@@ -278,6 +279,24 @@ app.post('/api/pagerx/command', requireAuth, async (req, res) => {
   const r = await deviceManager.runCommand(deviceId, command);
   if (r.status === 'FAILED') return res.status(403).json(r);
   res.json(r);
+});
+app.get('/api/pagerx/commander/capabilities', requireAuth, (req, res) => {
+  res.json(pagerxCommander.capabilities());
+});
+app.post('/api/pagerx/commander/message', requireAuth, async (req, res) => {
+  const { deviceId, message } = req.body || {};
+  if (!deviceId || typeof message !== 'string' || !message.trim()) {
+    return res.status(400).json({ error: 'deviceId and message are required.' });
+  }
+  if (message.length > 500) return res.status(413).json({ error: 'Message too long (max 500 characters).' });
+  try {
+    const result = await pagerxCommander.handleMessage({ deviceId, message });
+    store.audit('pagerx.commander', result.status, `Intent ${result.intent || 'unknown'} for device ${deviceId}.`);
+    res.json(result);
+  } catch (error) {
+    store.audit('pagerx.commander', 'FAILED', `Commander error for device ${deviceId}: ${error.message}`);
+    res.status(500).json({ error: 'Commander operation failed.' });
+  }
 });
 app.get('/api/devices/:id/tasks', requireAuth, (req, res) => {
   res.json({ tasks: deviceManager.taskHistory(req.params.id) });
