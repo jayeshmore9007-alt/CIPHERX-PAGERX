@@ -5,13 +5,13 @@ import { Panel, GlowButton, Mono, ScreenWrap, SectionHeader } from '../component
 import { COLORS } from '../theme';
 import { santokiMessage } from '../api/client';
 
-type Message = { role: 'user' | 'assistant'; text: string; steps?: string[]; status?: string; domain?: string };
+type Message = { role: 'user' | 'assistant'; text: string; steps?: string[]; status?: string; domain?: string; agent?: string; executor?: string };
 
 export const SantokiScreen: React.FC = () => {
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', text: 'नमस्कार! मी SANTOKI आहे. तुम्ही मराठीत सांगा—तुमचं काम समजून घेऊन योग्य CIPHERX एजंट आणि सुरक्षित टप्पे सुचवेन. सध्या मी योजना तयार करतो; प्रत्यक्ष कृतीसाठी जोडलेला executor आणि तुमची परवानगी आवश्यक आहे.' },
+    { role: 'assistant', text: 'नमस्कार! मी SANTOKI आहे. तुम्ही मराठीत सांगा—मी तुमची विनंती समजून योग्य AI एजंट निवडेन आणि कामाची योजना बनवेन. ज्या executor चे कनेक्शन उपलब्ध आहे तेवढेच काम प्रत्यक्ष करता येईल; प्रत्येक महत्त्वाच्या कृतीसाठी तुमची परवानगी आवश्यक आहे.' },
   ]);
 
   const send = async () => {
@@ -28,6 +28,8 @@ export const SantokiScreen: React.FC = () => {
         steps: result.steps_mr || [],
         status: result.status,
         domain: result.domain,
+        agent: result.agent_label_mr || result.agent_id,
+        executor: result.executor_state,
       }]);
     } catch (error: any) {
       setMessages((old) => [...old, { role: 'assistant', text: error.message || 'Backend शी संपर्क झाला नाही. Gateway आणि login तपासा.' }]);
@@ -38,10 +40,10 @@ export const SantokiScreen: React.FC = () => {
 
   return (
     <ScreenWrap>
-      <SectionHeader title="SANTOKI AI COMMANDER" subtitle="Marathi-first central brain · Multi-agent task planner" />
+      <SectionHeader title="SANTOKI AI COMMANDER" subtitle="Marathi-first central brain · Multi-agent task router" />
       <Panel title="CENTRAL INTELLIGENCE">
-        <Mono>तुम्ही मराठीत बोला किंवा लिहा. SANTOKI काम समजून योग्य विभाग निवडतो आणि टप्प्यांची योजना बनवतो.</Mono>
-        <Mono color={COLORS.primary}>MODE: PLAN ONLY · EXECUTION: APPROVAL REQUIRED</Mono>
+        <Mono>तुम्ही मराठीत बोला किंवा लिहा. SANTOKI तुमची सूचना समजून योग्य AI एजंटकडे काम पाठवण्याची योजना बनवतो.</Mono>
+        <Mono color={COLORS.primary}>MODE: PLAN + AGENT ROUTING · EXECUTION: CONNECTED EXECUTOR + APPROVAL REQUIRED</Mono>
       </Panel>
       <Panel title="CONVERSATION">
         <ScrollView style={styles.history} nestedScrollEnabled>
@@ -49,7 +51,9 @@ export const SantokiScreen: React.FC = () => {
             <View key={index} style={[styles.message, m.role === 'user' ? styles.user : styles.assistant]}>
               <Mono color={m.role === 'user' ? '#38e8ff' : '#00ff9c'}>{m.role === 'user' ? 'YOU' : 'SANTOKI AI'}</Mono>
               <Mono>{m.text}</Mono>
-              {m.domain ? <Mono color="#38e8ff">AGENT ROUTE: {m.domain.toUpperCase()}</Mono> : null}
+              {m.agent ? <Mono color="#38e8ff">SELECTED AGENT: {m.agent}</Mono> : null}
+              {m.domain ? <Mono color="#38e8ff">DOMAIN: {m.domain.toUpperCase()}</Mono> : null}
+              {m.executor ? <Mono color={m.executor === 'NOT_CONNECTED' ? COLORS.danger : COLORS.primary}>EXECUTOR: {m.executor}</Mono> : null}
               {m.steps?.map((step, i) => <Mono key={i}>{i + 1}. {step}</Mono>)}
               {m.status ? <Mono color="#8fae9f">STATUS: {m.status} · NO ACTION EXECUTED</Mono> : null}
             </View>
@@ -68,9 +72,9 @@ export const SantokiScreen: React.FC = () => {
         <GlowButton label={busy ? 'SANTOKI विचार करत आहे...' : 'SEND TO SANTOKI'} onPress={send} />
         <GlowButton label="CLEAR CHAT" variant="ghost" onPress={() => Alert.alert('Clear conversation?', 'या स्क्रीनवरील संभाषण हटवायचे?', [{ text: 'Cancel', style: 'cancel' }, { text: 'Clear', onPress: () => setMessages([]) }])} />
       </Panel>
-      <Panel title="CONNECTED AGENT DOMAINS">
-        <Mono>ANDROID · PAGER-X · CIPHERX PROJECT · BACKEND · AUTHORIZED COMPUTER · GENERAL AI</Mono>
-        <Mono color="#8fae9f">सर्व domains साठी प्रत्यक्ष नियंत्रण उपलब्ध आहे असे समजू नका. प्रत्येक executor स्वतंत्रपणे जोडून तपासावा लागेल.</Mono>
+      <Panel title="AGENT EXECUTOR STATUS">
+        <Mono>ANDROID: NOT CONNECTED · PAGER-X: LIMITED READ-ONLY · CIPHERX: NOT CONNECTED · BACKEND: NOT CONNECTED · COMPUTER: NOT CONNECTED</Mono>
+        <Mono color="#8fae9f">कनेक्शन, परवानग्या आणि प्रत्यक्ष चाचणी पूर्ण होईपर्यंत कोणत्याही domain वर full control असल्याचा दावा केला जाणार नाही.</Mono>
       </Panel>
     </ScreenWrap>
   );
