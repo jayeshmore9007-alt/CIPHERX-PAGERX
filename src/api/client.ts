@@ -141,5 +141,5 @@ export function openSocket(onEvent: (evt: any) => void): WebSocket {
 
  // SANTOKI AI Commander
 export const santokiMessage = (message: string) =>
-  call<{ status: string; domain?: string; summary_mr: string; steps_mr: string[]; needs_approval: boolean; execution: string }>('POST', '/api/santoki/message', { message });
+  call<{ status: string; domain?: string; agent_id?: string; agent_label_mr?: string; executor_state?: string; summary_mr: string; steps_mr: string[]; needs_approval: boolean; execution: string }>('POST', '/api/santoki/message', { message });
 export const santokiCapabilities = () => call<any>('GET', '/api/santoki/capabilities');
