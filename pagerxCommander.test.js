@@ -24,7 +24,7 @@ test('Commander refuses arbitrary shell and unsupported high-impact requests', (
 
 test('Commander advertises only bounded read-only diagnostics', () => {
   const caps = commander.capabilities();
-  assert.equal(caps.mode, 'deterministic-safe-command-router');
+  assert.equal(caps.mode, 'llm-assisted-intent-router-with-deterministic-fallback');
   assert.equal(caps.available.length, 6);
   assert.ok(caps.not_yet_available.some((x) => x.includes('Payload')));
 });
@@ -36,4 +36,10 @@ test('Pager enrollment accepts private IPv4 ranges only', () => {
   for (const host of ['8.8.8.8', '1.1.1.1', '127.0.0.1', 'example.com', '172.32.0.1']) {
     assert.equal(deviceManager.isPrivateIPv4(host), false, host);
   }
+});
+
+test('AI classifier safely falls back to fixed local intents when no provider is configured', async () => {
+  const intent = await commander.classifyWithAI('show device status');
+  assert.equal(intent.command, 'status');
+  assert.equal(await commander.classifyWithAI('deauthenticate nearby clients'), null);
 });
