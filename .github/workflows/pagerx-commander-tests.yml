@@ -16,5 +16,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Run Commander boundary tests
+      - name: Run focused root Commander tests
         run: node --test deviceManager.test.js pagerxCommander.test.js
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm install
+      - name: Run backend test suite
+        working-directory: backend
+        run: npm test
