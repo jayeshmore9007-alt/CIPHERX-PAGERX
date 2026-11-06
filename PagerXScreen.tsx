@@ -1,7 +1,7 @@
 // PagerXScreen.tsx - PAGER-X authorized device management: enrollment,
 // approval, hard allowlisted diagnostics, health checks and task history.
 import React, { useEffect, useState } from 'react';
-import { TextInput, StyleSheet, Alert, View } from 'react-native';
+import { TextInput, StyleSheet, Alert, View, Linking } from 'react-native';
 import { Panel, GlowButton, Mono, ScreenWrap, SectionHeader, StatusDot } from '../components/cyber';
 import { COLORS } from '../theme';
 import { devices, enrollDevice, approveDevice, revokeDevice, deviceHealth, deviceTasks, pagerxCommand, pagerxCommanderMessage } from '../api/client';
@@ -46,6 +46,18 @@ export const PagerXScreen: React.FC = () => {
     ]);
   };
 
+  const openVirtualPager = async () => {
+    const selected = list.find((d: any) => d.id === commanderDevice);
+    const host = selected?.host;
+    if (!host) return Alert.alert('Select a Pager', 'Enroll and select your Pager first.');
+    const url = `http://${host}`;
+    try {
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert('Cannot open Pager', 'Connect this phone to the Pager management network (or supported USB-C Ethernet) and try again.');
+    }
+  };
+
   const sendCommanderMessage = async () => {
     if (!commanderDevice || !commanderInput.trim() || commanderBusy) return;
     setCommanderBusy(true);
@@ -76,6 +88,7 @@ export const PagerXScreen: React.FC = () => {
             <GlowButton key={d.id} label={commanderDevice === d.id ? `Selected: ${d.name}` : d.name} variant={commanderDevice === d.id ? 'primary' : 'ghost'} onPress={() => setCommanderDevice(d.id)} />
           ))}
         </View>
+        <GlowButton label="Open Virtual Pager in Browser" variant="ghost" onPress={openVirtualPager} />
         <TextInput style={styles.input} placeholder="Ask PAGER-X AI (e.g. check device status)" placeholderTextColor={COLORS.textDim} value={commanderInput} onChangeText={setCommanderInput} multiline />
         <GlowButton label={commanderBusy ? "Working..." : "Ask Commander AI"} onPress={sendCommanderMessage} />
         {commanderReply ? <Mono>{commanderReply}</Mono> : null}
