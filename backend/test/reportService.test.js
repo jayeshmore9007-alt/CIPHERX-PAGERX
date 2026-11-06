@@ -4,6 +4,7 @@ const assert = require('node:assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { Writable } = require('stream');
 
 process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'reports-'));
 const reportService = require('../src/services/reportService');
@@ -39,15 +40,19 @@ test('toHtml refuses DONE_WITH_ERRORS? No - it is accepted', () => {
 });
 
 test('streamPdf writes a real PDF header', async () => {
-  const target = path.join(os.tmpdir(), `rep-${Date.now()}-${Math.random().toString(16).slice(2)}.pdf`);
-  const ws = fs.createWriteStream(target);
-  const finished = new Promise((resolve, reject) => {
-    ws.once('finish', resolve);
-    ws.once('error', reject);
+  const chunks = [];
+  const sink = new Writable({
+    write(chunk, encoding, callback) {
+      chunks.push(Buffer.from(chunk));
+      callback();
+    },
   });
-  assert.strictEqual(reportService.streamPdf(doneJob, ws), true);
+  const finished = new Promise((resolve, reject) => {
+    sink.once('finish', resolve);
+    sink.once('error', reject);
+  });
+  assert.strictEqual(reportService.streamPdf(doneJob, sink), true);
   await finished;
-  const buf = fs.readFileSync(target);
+  const buf = Buffer.concat(chunks);
   assert.strictEqual(buf.slice(0, 4).toString(), '%PDF');
-  fs.unlinkSync(target);
 });
