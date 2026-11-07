@@ -1,0 +1,44 @@
+name: CIPHERX-PAGERX Android APK Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Prepare EAS Archive
+        run: |
+          cat > .easignore <<'EOF'
+          node_modules/
+          .git/
+          .expo/
+          dist/
+          *.zip
+          npm-debug.log*
+          EOF
+
+      - name: Build Android APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          npx eas-cli@latest build \
+            --platform android \
+            --profile production \
+            --non-interactive
