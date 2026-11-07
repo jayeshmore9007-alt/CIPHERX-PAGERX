@@ -1,0 +1,30 @@
+name: PAGER-X Commander Tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, "feature/pagerx-android-commander"]
+
+jobs:
+  commander-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run focused root Commander tests
+        run: node --test deviceManager.test.js pagerxCommander.test.js
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm install
+      - name: Run backend test suite
+        working-directory: backend
+        run: npm test
+      - name: Install Expo app dependencies
+        run: npm install
+      - name: Type-check Android app
+        run: npx tsc --noEmit

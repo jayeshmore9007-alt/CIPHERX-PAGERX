@@ -14,20 +14,18 @@
         "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.ACCESS_WIFI_STATE"
       ],
-      "allowBackup": false
+      "allowBackup": false,
+      "usesCleartextTraffic": true
     },
-    "assetBundlePatterns": ["assets/*"],
+    "assetBundlePatterns": [
+      "assets/*"
+    ],
     "ios": {
       "supportsTablet": false,
       "infoPlist": {
         "NSLocalNetworkUsageDescription": "CIPHERX AI connects to your own backend server on the local network."
       }
     },
-    "plugins": [],
-    "extra": {
-      "eas": {
-        "projectId": "YOUR_REAL_EAS_PROJECT_ID"
-      }
-    }
+    "plugins": []
   }
 }

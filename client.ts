@@ -13,7 +13,7 @@ export async function setGateway(url: string): Promise<void> {
 
 export async function initGateway(): Promise<string> {
   if (!gateway) {
-    gateway = (await SecureStore.getItemAsync('cipherx-gateway')) || 'http://192.168.1.10:8080';
+    gateway = (await SecureStore.getItemAsync('cipherx-gateway')) || 'http://127.0.0.1:8080';
   }
   return gateway;
 }
@@ -112,12 +112,16 @@ export const deviceHealth = (id: string) => call<{ healthy: boolean; detail: str
 export const deviceTasks = (id: string) => call<{ tasks: any[] }>('GET', `/api/devices/${id}/tasks`);
 export const pagerxCommand = (deviceId: string, command: string) =>
   call<any>('POST', '/api/pagerx/command', { deviceId, command });
+export const pagerxCommanderCapabilities = () =>
+  call<any>('GET', '/api/pagerx/commander/capabilities');
+export const pagerxCommanderMessage = (deviceId: string, message: string) =>
+  call<any>('POST', '/api/pagerx/commander/message', { deviceId, message });
 
 // WebSocket
 export function openSocket(onEvent: (evt: any) => void): WebSocket {
   let ws: WebSocket;
   const connect = () => {
-    const base = (gateway || 'http://192.168.1.10:8080').replace(/^http/, 'ws');
+    const base = (gateway || 'http://127.0.0.1:8080').replace(/^http/, 'ws');
     ws = new WebSocket(`${base}/ws`);
     ws.onopen = async () => {
       const t = await token();

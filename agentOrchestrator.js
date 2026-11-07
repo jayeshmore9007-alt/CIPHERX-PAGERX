@@ -101,7 +101,7 @@ function retryJob(jobId) {
   queue.push(jobId);
   emit({ event: 'job:event', jobId, state: 'QUEUED' });
   processQueue();
-  return getJob(jobId);
+  return fresh;
 }
 
 async function processQueue() {
