@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "CIPHERX UNFILTERED AI",
+    "slug": "cipherx-unfiltered-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#000000",
+    "android": {
+      "package": "com.cipherx.unfilteredai",
+      "versionCode": 1,
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "ACCESS_WIFI_STATE"
+      ]
+    },
+    "extra": {
+      "eas": {
+        "projectId": "db9645fc-4866-4e65-9f09-33971ab855dd"
+      }
+    },
+    "plugins": [
+      "react-native-litert-lm"
+    ]
+  }
+}
