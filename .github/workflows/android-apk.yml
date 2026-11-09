@@ -52,6 +52,14 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Generate Android native project
         run: npx expo prebuild --platform android --clean --non-interactive
+      - name: Ensure splash screen color resource exists
+        run: |
+          mkdir -p android/app/src/main/res/values
+          cat > android/app/src/main/res/values/cipherx_splash_colors.xml <<'EOF'
+          <resources>
+            <color name="splashscreen_background">#000000</color>
+          </resources>
+          EOF
       - name: Build installable debug APK
         run: |
           cd android
