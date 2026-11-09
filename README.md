@@ -1,15 +1,42 @@
-# Required App Assets
+# CIPHERX UNFILTERED AI
 
-Before running a production EAS build, place real images here:
+Android Expo / React Native project with a cyberpunk chat interface and a defensive-security information screen.
 
-| File | Purpose | Recommended size |
-|---|---|---|
-| `icon.png` | App icon | 1024 x 1024, PNG, no transparency |
-| `adaptive-icon.png` | Android adaptive icon foreground | 1024 x 1024, PNG |
-| `adaptive-icon-background.png` | Android adaptive icon background (pure black `#000000` works) | 1024 x 1024 |
-| `splash.png` | Splash screen image | 1284 x 2778 or similar portrait PNG |
-| `splash-icon.png` | Centered splash logo | 512 x 512, PNG |
+## Build an Android APK with GitHub Actions
 
-Suggested style: pure black background with the neon green (#00FF9C) and cyan (#38E8FF) CIPHERX motif.
+1. Open the **Actions** tab in this repository.
+2. Select **Build Android APK**.
+3. Press **Run workflow** on the `main` branch.
+4. When the run finishes successfully, open the run and download the `CIPHERX-UNFILTERED-AI-debug-apk` artifact.
+5. Extract the downloaded ZIP to get `app-debug.apk`.
 
-Without these files, EAS still builds but ships default Expo assets. Generate them with any image editor, or with Expo's tools (https://docs.expo.dev/develop/user-interface/splash-screen/ and app-icons).
+The workflow also runs automatically on pushes to `main`.
+
+## Project layout
+
+- `app/`: Expo React Native Android application.
+- `backend/`: Express API adapter for a separately running Ollama server.
+- `docs/IMPLEMENTATION-STATUS.md`: implemented features and known limitations.
+
+## Important implementation notes
+
+This uploaded source is a starter implementation. The chat UI calls the configured backend. The backend forwards requests to an Ollama server at the configured URL (default `http://127.0.0.1:11434`). Ollama is **not bundled** in the APK.
+
+The Security Lab cards are informational placeholders; they do not run Wi-Fi scans, device inventory, vulnerability scans, or malware analysis. Online AI provider integration and embedded on-device offline model inference are not implemented yet. The LiteRT package is present as a dependency/plugin, but no model is bundled or loaded by the app.
+
+Use the app only for lawful defensive security work on systems you own or are authorized to assess. Do not expose the starter backend publicly without authentication, TLS, rate limiting, and production hardening.
+
+## Local backend
+
+```bash
+cd backend
+npm install
+npm start
+```
+
+Environment variables:
+- `PORT` (default `3000`)
+- `OLLAMA_BASE_URL` (default `http://127.0.0.1:11434`)
+- `OLLAMA_MODEL` (default `llama3.2`)
+
+Never commit API keys, tokens, or `.env` files.
