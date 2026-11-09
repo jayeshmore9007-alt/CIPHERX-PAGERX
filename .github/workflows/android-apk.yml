@@ -1,7 +1,13 @@
 name: CIPHERX Android APK
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   backend-tests:
@@ -11,12 +17,14 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
       - name: Install backend dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
       - name: Run backend tests
         run: npm test
 
@@ -25,21 +33,34 @@ jobs:
     needs: backend-tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install Expo app dependencies
-        run: npm install
-      - name: Require Expo token
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+      - name: Install root Expo app dependencies
+        run: npm install --no-audit --no-fund
+      - name: Generate Android native project
+        run: npx expo prebuild --platform android --clean --non-interactive
+      - name: Build installable debug APK
         run: |
-          if [ -z "$EXPO_TOKEN" ]; then
-            echo "::error::Add EXPO_TOKEN as a GitHub Actions repository secret."
-            exit 1
-          fi
-      - name: Build production APK with EAS
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx eas-cli@latest build --platform android --profile production --non-interactive
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CIPHERX-PAGERX-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
