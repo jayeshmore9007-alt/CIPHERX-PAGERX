@@ -1,0 +1,25 @@
+name: CIPHERX-PAGERX Source Audit Export
+
+on:
+  push:
+    branches:
+      - cipherx-source-audit
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package repository source
+        run: |
+          mkdir -p dist
+          git archive --format=zip --output=dist/CIPHERX-PAGERX-REPOSITORY-SOURCE.zip HEAD
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CIPHERX-PAGERX-SOURCE-AUDIT
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 14
